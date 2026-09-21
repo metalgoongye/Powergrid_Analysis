@@ -1,0 +1,40 @@
+# 원본·파생 공간자료는 저장소에 넣지 않는다 (보안·용량, CLAUDE.md 참조)
+*.gpkg
+*.tif
+*.tiff
+*.shp
+*.shx
+*.dbf
+*.prj
+*.cpg
+*.zip
+*.img
+*.jp2
+
+# 좌표 포함 산출물 (집계 단위만 public)
+out/internal/*
+!out/internal/.gitkeep
+out/public/*.geojson
+
+# 실행 산출물·수집 원본
+out/public/*
+!out/public/.gitkeep
+raw/*
+!raw/sample/
+raw/sample/*
+!raw/sample/.gitkeep
+logs/
+
+# 비밀
+.env
+
+# 파이썬
+__pycache__/
+*.pyc
+.venv/
+.ipynb_checkpoints/
+
+# OS / 편집기
+.DS_Store
+Thumbs.db
+.claude/settings.local.json

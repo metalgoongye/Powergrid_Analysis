@@ -1,0 +1,78 @@
+# 공간 레이어 레지스트리. 여기 등록된 레이어만 분석에 쓴다.
+# expected_count는 검증 기준값. 데이터를 재수집(새 export)하면 사용자 확인 후 갱신한다.
+# security: internal(좌표 포함 산출물은 out/internal만) / public(집계 공개 가능)
+# 경로는 DATA_ROOT(기본 D:\z03.SmartGrid) 기준 상대경로.
+
+datasets:
+  - id: kor_infra
+    kind: gpkg
+    path: powergrid_spatial_data/36pJ2bwdQr/KOR.gpkg
+    source: OpenInfraMap export 2026-09-01 (© OpenStreetMap contributors)
+    license: ODbL
+    security: internal
+    crs_epsg: 4326
+    verified: 2026-09-21   # sqlite 직접 집계. docs/06_gpkg_inventory.md(2026-09-14)와 일치
+    layers:
+      power_line:               { geometry: line,    expected_count: 4514 }
+      power_tower:              { geometry: point,   expected_count: 45921 }
+      power_substation_polygon: { geometry: polygon, expected_count: 1129 }
+      power_substation_point:   { geometry: point,   expected_count: 63 }
+      power_plant:              { geometry: polygon, expected_count: 4184 }
+      power_generator_point:    { geometry: point,   expected_count: 1625 }
+      power_generator_polygon:  { geometry: polygon, expected_count: 7178 }
+      power_transformer:        { geometry: point,   expected_count: 169 }
+      power_switch:             { geometry: point,   expected_count: 310 }
+      power_compensator:        { geometry: point,   expected_count: 24 }
+      mast:                     { geometry: point,   expected_count: 692 }
+      pipeline:                 { geometry: line,    expected_count: 461 }
+      pipeline_feature:         { geometry: point,   expected_count: 0 }
+      petroleum_site:           { geometry: polygon, expected_count: 34 }
+      petroleum_well:           { geometry: point,   expected_count: 0 }
+      pumping_station:          { geometry: polygon, expected_count: 93 }
+      telecom_building_point:   { geometry: point,   expected_count: 4 }
+      telecom_building_polygon: { geometry: polygon, expected_count: 20 }
+      telecom_cable:            { geometry: line,    expected_count: 2 }
+      wastewater_plant:         { geometry: polygon, expected_count: 431 }
+      water_reservoir:          { geometry: polygon, expected_count: 14959 }
+      water_tower_point:        { geometry: point,   expected_count: 30 }
+      water_tower_polygon:      { geometry: polygon, expected_count: 35 }
+      water_treatment_plant:    { geometry: polygon, expected_count: 177 }
+      water_well_point:         { geometry: point,   expected_count: 42 }
+      water_well_polygon:       { geometry: polygon, expected_count: 8 }
+
+  - id: adm_sido
+    kind: shapefile
+    path: 행정경계/bnd_sido_00_2025_2Q/bnd_sido_00_2025_2Q.shp
+    source: 통계청 SGIS 센서스 경계 2025 2Q
+    license: 공공누리 (SGIS 이용약관 확인)
+    security: public
+    crs_epsg: 5179          # prj: Korea 2000 Unified CS
+    code_field: SIDO_CD     # 통계청 코드. 행정표준코드 아님 — 매핑 시 주의
+    expected_count: 17
+    verified: 2026-09-21
+
+  - id: adm_sigungu
+    kind: shapefile
+    path: 행정경계/bnd_sigungu_00_2025_2Q/bnd_sigungu_00_2025_2Q.shp
+    source: 통계청 SGIS 센서스 경계 2025 2Q
+    license: 공공누리 (SGIS 이용약관 확인)
+    security: public
+    crs_epsg: 5179
+    code_field: SIGUNGU_CD
+    expected_count: 252
+    verified: 2026-09-21
+
+  - id: adm_dong
+    kind: shapefile
+    path: 행정경계/bnd_dong_00_2025_2Q/bnd_dong_00_2025_2Q.shp
+    source: 통계청 SGIS 센서스 경계 2025 2Q
+    license: 공공누리 (SGIS 이용약관 확인)
+    security: public
+    crs_epsg: 5179
+    code_field: ADM_CD
+    expected_count: 3559
+    verified: 2026-09-21
+
+# 위성/항공영상은 취득 후 여기에 raster 항목으로 등록한다.
+# 양식: id, kind: raster, path, source, license, security, crs_epsg,
+#       resolution_m, acquisition_date, manifest(파일 목록+sha256), verified

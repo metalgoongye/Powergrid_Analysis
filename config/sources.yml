@@ -1,0 +1,50 @@
+# 표형(비공간) 소스 정의. 새 지표 추가는 이 파일만 고친다.
+# API 소스는 references/api-registry.md에 실호출 검증 명세가 먼저 있어야 한다.
+project: 지역별 차등요금제 — 국토균형발전 효과 분석
+timezone: Asia/Seoul
+
+sources:
+  - id: kepco_supply_substation
+    name: 한국전력공사 — 읍면동별 공급가능 변전소
+    kind: local_csv
+    path: 한국전력공사_지역별 공급가능 변전소 정보_20240513.csv   # DATA_ROOT 기준
+    encoding: utf-8-sig
+    columns: [시도, 시군구, 읍면동, 공급변전소]
+    expected_rows: 4557
+    vintage: "2024-05-13"
+    origin: 공공데이터포털
+    note: 변전소명이 일부 마스킹(예 '가*')되어 있음. 매칭 시 접두 일치로 처리하고 판정 기록.
+    verified: 2026-09-21
+
+  # ── 등록 예정 (api-registry 검증 후 활성화) ─────────────────────────
+  # - id: kosis_power_sales
+  #   name: KOSIS — 시군구/계약종별 판매전력량
+  #   kind: api
+  #   endpoint: https://kosis.kr/openapi/Param/statisticsParameterData.do
+  #   auth: { required: true, param: apiKey, env: KOSIS_API_KEY }
+  #   status: 미검증 — 통계표 ID 탐색 후 실호출 검증 필요
+
+imagery:
+  # 위성/항공영상 취득 계획. 취득물은 config/layers.yml에 raster로 등록한다.
+  - id: ngii_ortho
+    name: 국토지리정보원 항공정사영상 (25cm)
+    kind: manual            # API 아님. 국토정보플랫폼 신청·다운로드 기반
+    portal: https://map.ngii.go.kr
+    license: 이용허락범위 제한 없음 (다운로드 시 조건 재확인)
+    status: 부분 보유 (powergrid_spatial_data/정사영상 문의처 참고)
+
+  - id: cdse_sentinel2
+    name: Copernicus Data Space — Sentinel-2 L2A
+    kind: api               # STAC 검색 + 다운로드. 무료, 토큰 필요
+    endpoint: https://catalogue.dataspace.copernicus.eu/stac
+    auth: { required: true, env: CDSE_TOKEN }
+    resolution_m: 10
+    status: 미검증 — 실호출 검증 후 api-registry 등록
+
+  - id: vworld_wmts
+    name: VWorld 위성/항공 타일 (WMTS)
+    kind: api
+    endpoint: https://api.vworld.kr/req/wmts/1.0.0/{key}/Satellite/{z}/{y}/{x}.jpeg
+    auth: { required: true, env: VWORLD_API_KEY }
+    note: 타일은 배경지도·육안 확인용. 분석용 원본 영상은 NGII/CDSE 사용
+    status: 미검증
