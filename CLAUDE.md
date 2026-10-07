@@ -51,6 +51,7 @@ ADM_CD)는 통계청 코드로, 행정표준코드와 다르다. 동명 시군�
 | 전력·인프라 벡터 26 레이어 (ODbL) | `powergrid_spatial_data/36pJ2bwdQr/KOR.gpkg` | `config/layers.yml` |
 | 행정경계 시도/시군구/읍면동 (SGIS 2025 2Q) | `행정경계/bnd_*_00_2025_2Q/` | `config/layers.yml` |
 | 한전 읍면동별 공급변전소 CSV | `한국전력공사_지역별 공급가능 변전소 정보_20240513.csv` | `config/sources.yml` |
+| 비공간 표형 자료 (MDIS 등) | `rdb/<통계명>/` | `config/sources.yml` |
 | 위성/항공영상 (취득 예정) | `powergrid_spatial_data/` 하위 | 취득 후 등록 |
 
 ## 자주 쓰는 명령
