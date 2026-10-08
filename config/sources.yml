@@ -32,6 +32,32 @@ sources:
       가중 분석 시 시군구가중값 필수. 설계서 - 같은 폴더 descriptionFiles.
     verified: 2026-10-07
 
+  - id: kepco_substation_supply_margin
+    name: 한전ON — 변전소별 전력공급 여유용량 (2026~2032 전망)
+    kind: local_csv
+    path: rdb/변전소별_접속가능여유용량/한전ON_변전소별_전력공급_여유용량_20261008.csv
+    encoding: utf-8-sig
+    columns: [시도, 시군구, 읍면동, 변전소명, 변전소코드, 전압구분, 기준연도, 전력공급여유용량_2026(MW), 전력공급여유용량_2027(MW), 전력공급여유용량_2028(MW), 전력공급여유용량_2029(MW), 전력공급여유용량_2030(MW), 전력공급여유용량_2031(MW), 전력공급여유용량_2032(MW)]
+    expected_rows: 1706
+    vintage: "2026-10-08"
+    origin: 한전ON(online.kepco.co.kr) 전력공급 여유정보 공개
+    note: >
+      수요측(신규 부하 접속) 여유. 2단계 권역 수요합 정합성 검증의 본체. 일부 행 시도/시군구 결측 - 변전소코드·명으로 매칭. 154kV/22.9kV 혼재 - 분석은 154kV 필터.
+    verified: 2026-10-08
+
+  - id: kepco_substation_re_margin
+    name: 한전ON — 변전소별 재생e 연계 송전망 여유용량 (2026~2032 전망)
+    kind: local_csv
+    path: rdb/변전소별_접속가능여유용량/한전ON_변전소별_재생e연계_여유용량_20261008.csv
+    encoding: utf-8-sig
+    columns: [시도, 시군구, 읍면동, 변전소명, 변전소코드, 기준연도, 송전망여유용량_2026(MW), 송전망여유용량_2027(MW), 송전망여유용량_2028(MW), 송전망여유용량_2029(MW), 송전망여유용량_2030(MW), 송전망여유용량_2031(MW), 송전망여유용량_2032(MW), 발전허가신청용량(MW), 이용신청_접속예정사업자(명)]
+    expected_rows: 965
+    vintage: "2026-10-08"
+    origin: 한전ON(online.kepco.co.kr) 전력공급 여유정보 공개
+    note: >
+      발전측(재생에너지 접속) 여유 + 발전허가신청·접속예정. 계통관리변전소(발전 포화) 식별 보조.
+    verified: 2026-10-08
+
   # ── 등록 예정 (api-registry 검증 후 활성화) ─────────────────────────
   # - id: kosis_power_sales
   #   name: KOSIS — 시군구/계약종별 판매전력량
