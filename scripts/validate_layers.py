@@ -17,6 +17,7 @@ import os
 import sqlite3
 import struct
 import sys
+import zipfile
 
 import yaml
 
@@ -86,6 +87,56 @@ def check_shapefile(ds: dict) -> None:
         report("WARN", ds["id"], f".prj에서 Korea_2000 명칭을 찾지 못함 — 좌표계 수동 확인 필요")
 
 
+def _zip_member_name(info: zipfile.ZipInfo) -> str:
+    try:
+        return info.filename.encode("cp437").decode("cp949")
+    except Exception:
+        return info.filename
+
+
+def check_shp_zip_set(ds: dict) -> None:
+    """zip 안에 (파트 분할된) shapefile이 든 세트. 파일별 dbf 레코드 합을 기준값과 대조."""
+    folder = os.path.join(DATA_ROOT, ds["path"])
+    if not os.path.isdir(folder):
+        report("FAIL", ds["id"], f"폴더 없음: {folder}")
+        return
+    for fname, expected in ds["files"].items():
+        path = os.path.join(folder, fname)
+        if not os.path.isfile(path):
+            report("FAIL", ds["id"], f"파일 없음: {fname}")
+            continue
+        try:
+            zf = zipfile.ZipFile(path)
+        except zipfile.BadZipFile:
+            report("FAIL", ds["id"], f"zip 손상: {fname}")
+            continue
+        n, parts, prj_ok = 0, 0, None
+        for info in zf.infolist():
+            name = _zip_member_name(info).lower()
+            try:
+                if name.endswith(".dbf"):
+                    with zf.open(info) as fh:
+                        n += struct.unpack("<I", fh.read(32)[4:8])[0]
+                    parts += 1
+                elif name.endswith(".prj") and prj_ok is None:
+                    with zf.open(info) as fh:
+                        prj_ok = ds.get("prj_keyword", "") in fh.read(600).decode(
+                            "ascii", errors="replace"
+                        )
+            except Exception as exc:
+                report("FAIL", ds["id"], f"{fname}: 멤버 읽기 실패 ({type(exc).__name__})")
+                n = -1
+                break
+        if n < 0:
+            continue
+        if n != expected:
+            report("FAIL", ds["id"], f"{fname}: {n}건 != 기준값 {expected}건")
+        elif prj_ok is False:
+            report("WARN", ds["id"], f"{fname}: .prj에 '{ds['prj_keyword']}' 없음 — 좌표계 확인 필요")
+        else:
+            report("OK", ds["id"], f"{fname}: {n}건 ({parts}파트)")
+
+
 def check_local_csv(src: dict) -> None:
     path = os.path.join(DATA_ROOT, src["path"])
     if not os.path.isfile(path):
@@ -114,6 +165,8 @@ def main() -> int:
             check_gpkg(ds)
         elif ds["kind"] == "shapefile":
             check_shapefile(ds)
+        elif ds["kind"] == "shp_zip_set":
+            check_shp_zip_set(ds)
         else:
             report("WARN", ds["id"], f"검사 미구현 kind: {ds['kind']}")
 

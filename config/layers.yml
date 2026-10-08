@@ -73,6 +73,64 @@ datasets:
     expected_count: 3559
     verified: 2026-09-21
 
+  - id: cadastral_parcels_2024
+    kind: shp_zip_set
+    path: powergrid_spatial_data/연속지적도형정보
+    source: 국가공간정보포털 연속지적도형정보(AL_D002), 기준일 2024-12-04
+    license: 공공데이터 (국가공간정보포털 이용조건)
+    security: public
+    crs_epsg: 5186
+    prj_keyword: Central_Belt
+    note: 필지 폴리곤 + PNU. 건물에너지 지번 데이터의 공간 결합 키. 구코드 체계(광주29·전남46 분리).
+    verified: 2026-10-08
+    files:
+      AL_D002_11_20241204.zip: 902137
+      AL_D002_26_20241204.zip: 712591
+      AL_D002_27_20241204.zip: 789757
+      AL_D002_28_20241204.zip: 668644
+      AL_D002_29_20241204.zip: 390491
+      AL_D002_30_20241204.zip: 292197
+      AL_D002_31_20241204.zip: 508961
+      AL_D002_36_20241204.zip: 206239
+      AL_D002_41_20241204.zip: 5176941
+      AL_D002_43_20241204.zip: 2397877
+      AL_D002_44_20241204.zip: 3746838
+      AL_D002_46_20241204.zip: 5904768
+      AL_D002_47_20241204.zip: 5699351
+      AL_D002_48_20241204.zip: 4823185
+      AL_D002_50_20241204.zip: 880881
+      AL_D002_51_20241204.zip: 2734444
+      AL_D002_52_20241204.zip: 3871845
+
+  - id: gis_building_2024
+    kind: shp_zip_set
+    path: powergrid_spatial_data/GIS건물통합정보
+    source: 국가공간정보포털 GIS건물통합정보(AL_D010), 기준일 2024-12-04
+    license: 공공데이터 (국가공간정보포털 이용조건)
+    security: public
+    crs_epsg: 5186
+    prj_keyword: Central_Belt
+    note: 건물 폴리곤 + 용도코드·연면적(대장 속성 결합본). 용도 분해·면적가중 격자화·이상치 검증용. 구코드 체계.
+    verified: 2026-10-08
+    files:
+      AL_D010_11_20241204.zip: 695889
+      AL_D010_26_20241204.zip: 472618
+      AL_D010_27_20241204.zip: 382810
+      AL_D010_28_20241204.zip: 296022
+      AL_D010_29_20241204.zip: 199367
+      AL_D010_30_20241204.zip: 175275
+      AL_D010_31_20241204.zip: 254739
+      AL_D010_36_20241204.zip: 77352
+      AL_D010_41_20241204.zip: 2297586
+      AL_D010_43_20241204.zip: 836413
+      AL_D010_44_20241204.zip: 1317326
+      AL_D010_46_20241204.zip: 1643789
+      AL_D010_47_20241204.zip: 2009337
+      AL_D010_48_20241204.zip: 1652087
+      AL_D010_50_20241204.zip: 373289
+      AL_D010_51_20241204.zip: 749675
+      AL_D010_52_20241204.zip: 955084
+
 # 위성/항공영상은 취득 후 여기에 raster 항목으로 등록한다.
 # 양식: id, kind: raster, path, source, license, security, crs_epsg,
 #       resolution_m, acquisition_date, manifest(파일 목록+sha256), verified
