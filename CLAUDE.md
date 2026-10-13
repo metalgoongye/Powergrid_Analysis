@@ -71,7 +71,8 @@ python scripts/validate_layers.py --strict   # 경고도 실패로 처리
 모델링 노트 문체). 전체 분석 완료 시 이 노트를 워드 문서로 변환해
 `docs/modeling/`의 모델링 노트처럼 학습용 판을 만든다. 연구자가 경제학·통계
 개념을 질문하면 답을 `docs/qa_econ_concepts.md`에 Q&A 형식으로 이어붙인다.
-[규칙 2026-10-13]
+모수 추정이나 데이터 가공이 하나 완결될 때마다 `docs/data_provenance.md`
+(변수·데이터 명세 — 출처·취득일·가공·결과·한계)를 갱신한다. [규칙 2026-10-13]
 
 ## 절차
 

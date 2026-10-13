@@ -144,6 +144,22 @@ sources:
                               # 요소소득(명목). s 추정의 분모 재료
     verified: 2026-10-13
 
+  - id: epsis_smp_hourly_2024
+    name: EPSIS — 시간별 SMP 육지/제주 (2024 전체)
+    kind: local_csv_set
+    path: rdb/SMP_시간별_2024
+    vintage: "2024-01-01 ~ 2024-12-31 (시간별 24열 + 최대/최소/가중평균)"
+    origin: epsis.kpx.or.kr 전력거래>계통한계가격>시간별SMP (2026-10-13 직접 다운로드)
+    note: >
+      λ(혼잡료) 1차 실증 - 제주-육지 시간별 격차. cp949, 행=일(내림차순).
+      제주 2024/03/21 하루 결측(원천 자체). 2024-06-01부터 제주 시범사업
+      DA/RT 체제 - 상/하반기 분리 해석(scripts/param_lambda_smp.py).
+      SMP는 도매가격임에 주의(소매 λ 해석 시 전가 구조 경유).
+    files:
+      - epsis_smp_hourly_2024_육지.csv  # 366일
+      - epsis_smp_hourly_2024_제주.csv  # 365일
+    verified: 2026-10-13
+
   # ── 등록 예정 (api-registry 검증 후 활성화) ─────────────────────────
   # - id: kosis_power_sales
   #   name: KOSIS — 시군구/계약종별 판매전력량
