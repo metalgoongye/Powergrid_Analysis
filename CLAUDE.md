@@ -69,7 +69,9 @@ python scripts/validate_layers.py --strict   # 경고도 실패로 처리
 **분석 노트를 같이 갱신한다.** 분석 단계가 하나 끝날 때마다
 `docs/analysis_note.md`에 무엇을/왜/어떻게/결과/주의 틀로 기록한다(쉬운 용어,
 모델링 노트 문체). 전체 분석 완료 시 이 노트를 워드 문서로 변환해
-`docs/modeling/`의 모델링 노트처럼 학습용 판을 만든다.
+`docs/modeling/`의 모델링 노트처럼 학습용 판을 만든다. 연구자가 경제학·통계
+개념을 질문하면 답을 `docs/qa_econ_concepts.md`에 Q&A 형식으로 이어붙인다.
+[규칙 2026-10-13]
 
 ## 절차
 
