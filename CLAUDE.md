@@ -62,9 +62,14 @@ ADM_CD)는 통계청 코드로, 행정표준코드와 다르다. 동명 시군�
 ## 자주 쓰는 명령
 
 ```bash
-python scripts/validate_layers.py            # 레지스트리 vs 실제 파일 정합성 검증
-python scripts/validate_layers.py --strict   # 경고도 실패로 처리
+python scripts/validate_layers.py            # 공간 레지스트리 vs 실제 파일 검증
+python scripts/validate_sources.py           # 표형 레지스트리 검증 + rdb 미등록 감지
+git config core.hooksPath scripts/git_hooks  # (클론마다 1회) 공개 저장소 보호 훅 설치
 ```
+
+슬래시 커맨드(`.claude/skills/`): `/status` 연구 현황판 · `/ingest` 데이터 반입
+루틴 · `/wrap` 세션 마무리 · `/export-docs` 문서 Word 변환. 주간 브리핑은
+클라우드 루틴(매주 월 09:00 KST)이 담당한다.
 
 **분석 노트를 같이 갱신한다.** 분석 단계가 하나 끝날 때마다
 `docs/analysis_note.md`에 무엇을/왜/어떻게/결과/주의 틀로 기록한다(쉬운 용어,

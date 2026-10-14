@@ -1,0 +1,35 @@
+#!/bin/sh
+# 공개 저장소 보호 훅 (설치: git config core.hooksPath scripts/git_hooks)
+# ① 원본 공간자료·내부 산출물 차단 ② 10MB 초과 차단
+# ③ config/ 또는 검증기 변경 시 레지스트리 검증 실행
+
+staged=$(git diff --cached --name-only --diff-filter=ACMR)
+[ -z "$staged" ] && exit 0
+
+blocked=$(echo "$staged" | grep -Ei '\.(gpkg|shp|shx|dbf|prj|tif|tiff|img|las|laz)$|^out/internal/')
+if [ -n "$blocked" ]; then
+  echo "커밋 차단 — 원본 공간자료/내부 산출물은 공개 저장소에 올릴 수 없습니다 (CLAUDE.md 보안 등급):"
+  echo "$blocked" | sed 's/^/  /'
+  exit 1
+fi
+
+LIMIT=10485760  # 10MB
+echo "$staged" | while IFS= read -r f; do
+  if [ -f "$f" ]; then
+    size=$(wc -c < "$f")
+    if [ "$size" -gt "$LIMIT" ]; then
+      echo "커밋 차단 — 10MB 초과: $f ($size bytes). 데이터는 DATA_ROOT에 두세요."
+      exit 1
+    fi
+  fi
+done || exit 1
+
+if echo "$staged" | grep -qE '^(config/|scripts/validate_)'; then
+  PY=".venv/Scripts/python.exe"
+  [ -x "$PY" ] || PY=python
+  echo "레지스트리 변경 감지 — 검증 실행..."
+  "$PY" scripts/validate_layers.py || { echo "validate_layers 실패 — 커밋 중단"; exit 1; }
+  "$PY" scripts/validate_sources.py || { echo "validate_sources 실패 — 커밋 중단"; exit 1; }
+fi
+
+exit 0
