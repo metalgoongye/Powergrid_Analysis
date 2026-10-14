@@ -16,8 +16,9 @@ description: 연구 현황판 — 모형 모수 4종 상태, 대기 작업, 마�
 4. **대기 작업**: `docs/data_provenance.md` §5(보유·대기 자료) +
    `references/key-evidence.md`의 "할 일" 표식을 긁어 목록화.
    사용자 액션 대기(다운로드·신청·결정)와 Claude 작업 대기를 구분해 표시.
-5. **건강 점검**: `validate_layers.py`와 `validate_sources.py`를 실행해
-   OK/WARN/FAIL 요약 한 줄씩.
+5. **건강 점검**: `validate_layers.py`, `validate_sources.py`,
+   `param_checklist.py`(모수별 재료·코드·산출물 실존 검사)를 실행해
+   각 한 줄 요약. param_checklist에서 누락(X)이 나오면 최상단에 경고.
 
 출력은 간결한 현황판 하나로: 표 2개(모수, 단계) + 대기 목록 + 검증 요약.
 새 분석을 시작하지 말 것 — 이 명령은 읽기 전용 점검이다.
