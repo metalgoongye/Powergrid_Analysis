@@ -78,6 +78,10 @@ git config core.hooksPath scripts/git_hooks  # (클론마다 1회) 공개 저장
 개념을 질문하면 답을 `docs/qa_econ_concepts.md`에 Q&A 형식으로 이어붙인다.
 모수 추정이나 데이터 가공이 하나 완결될 때마다 `docs/data_provenance.md`
 (변수·데이터 명세 — 출처·취득일·가공·결과·한계)를 갱신한다. [규칙 2026-10-13]
+분석 모듈(방법)이 하나 확정될 때마다 `docs/methods.md`(분석방법 명세 —
+목적·투입·절차·산출·검증·한계, 최종보고서 방법 장의 원고)에 절을 추가한다.
+방법론의 정본은 methods.md, 데이터 이력은 provenance, 서사는 analysis_note로
+역할을 가른다. [규칙 2026-10-15]
 
 ## 절차
 

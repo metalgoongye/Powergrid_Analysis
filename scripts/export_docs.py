@@ -23,6 +23,7 @@ TARGETS = {  # 키워드: (원본 md, 출력 파일명)
     "분석": ("docs/analysis_note.md", "분석노트.docx"),
     "qa": ("docs/qa_econ_concepts.md", "경제학개념QA.docx"),
     "명세": ("docs/data_provenance.md", "변수데이터명세.docx"),
+    "방법": ("docs/methods.md", "분석방법명세.docx"),
     "geoai": ("docs/geoai_db_discussion_20261012.md", "GeoAI_DB논의_20261012.docx"),
 }
 

@@ -12,6 +12,7 @@ description: 세션 마무리 루틴 — 검증, 문서 갱신 누락 점검, �
 2. **문서 갱신 누락 점검**: 이번 세션에서 한 일 대비 네 장부의 반영 여부 확인 —
    - `docs/analysis_note.md` (분석 단계 완결 시)
    - `docs/data_provenance.md` (모수 추정·데이터 가공 완결 시)
+   - `docs/methods.md` (분석 방법 확정·변경 시 — 보고서 방법 장 원고)
    - `docs/qa_econ_concepts.md` (개념 질문이 있었을 시)
    - `references/key-evidence.md` (새 외부 근거·확정 사실)
    누락이 있으면 지금 채운다(쉬운 용어, 기존 문체).
