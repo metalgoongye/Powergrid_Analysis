@@ -137,6 +137,30 @@ def check_shp_zip_set(ds: dict) -> None:
             report("OK", ds["id"], f"{fname}: {n}건 ({parts}파트)")
 
 
+def check_raster_scene_set(ds: dict) -> None:
+    """장면 단위 위성 정사영상 세트. 장면별 결정 밴드 tif(0바이트 금지)와
+    georeference 전거인 Aux.xml의 존재를 검사한다(국토위성 tif는 지오태그 없음)."""
+    folder = os.path.join(DATA_ROOT, ds["path"])
+    if not os.path.isdir(folder):
+        report("FAIL", ds["id"], f"폴더 없음: {folder}")
+        return
+    for sid in ds["scenes"]:
+        missing, empty = [], []
+        for band in ds["bands"]:
+            p = os.path.join(folder, f"{sid}_L2G_{band}.tif")
+            if not os.path.isfile(p):
+                missing.append(band)
+            elif os.path.getsize(p) == 0:
+                empty.append(band)
+        if not os.path.isfile(os.path.join(folder, f"{sid}_L2G_Aux.xml")):
+            missing.append("Aux")
+        if missing or empty:
+            report("FAIL", ds["id"],
+                   f"{sid}: 누락 {missing or '없음'} · 0바이트 {empty or '없음'}")
+        else:
+            report("OK", ds["id"], f"{sid}: {len(ds['bands'])}밴드+Aux")
+
+
 def check_local_csv(src: dict) -> None:
     path = os.path.join(DATA_ROOT, src["path"])
     if not os.path.isfile(path):
@@ -167,6 +191,8 @@ def main() -> int:
             check_shapefile(ds)
         elif ds["kind"] == "shp_zip_set":
             check_shp_zip_set(ds)
+        elif ds["kind"] == "raster_scene_set":
+            check_raster_scene_set(ds)
         else:
             report("WARN", ds["id"], f"검사 미구현 kind: {ds['kind']}")
 
