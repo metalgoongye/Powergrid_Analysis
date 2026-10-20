@@ -133,7 +133,7 @@ datasets:
 
   - id: kls_ortho_pilot_new
     kind: raster_scene_set
-    path: powergrid_spatial_data/정사영상_전국/신규신청_보령서천은평
+    path: powergrid_spatial_data/정사영상_전국/위성정사영상_분석대상지역   # 2026-10-20 폴더명 변경(구 위성정사영상_분석대상지역)
     source: 국토지리정보원 국토위성(CAS500-1) L2G 정사영상, 포털 주문분 2026-10-13~15 수령
     license: 국토지리정보원 국토위성영상 이용약관
     security: internal   # 영상 자체는 경관이나, GeoAI 탐지 산출물(설비 좌표)은 out/internal
