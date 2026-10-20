@@ -30,7 +30,7 @@ REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_ROOT = os.environ.get("DATA_ROOT", r"D:\z03.SmartGrid")
 SHP = os.path.join(DATA_ROOT, "행정경계", "bnd_sigungu_00_2025_2Q", "bnd_sigungu_00_2025_2Q")
 OUT = os.path.join(REPO, "out", "public")
-TARGETS = ["서천군", "보령시", "은평구"]
+TARGETS = ["서천군", "보령시", "은평구", "화성시", "세종시"]  # 화성·세종 추가 2026-10-20
 
 T = Transformer.from_crs("EPSG:4326", "EPSG:5179", always_xy=True)
 T_INV = Transformer.from_crs("EPSG:5179", "EPSG:4326", always_xy=True)
