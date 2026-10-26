@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import csv
 import os
+import re
 import sqlite3
 import struct
 import sys
@@ -161,6 +162,51 @@ def check_raster_scene_set(ds: dict) -> None:
             report("OK", ds["id"], f"{sid}: {len(ds['bands'])}밴드+Aux")
 
 
+def check_aerial_sheet_set(ds: dict) -> None:
+    """1:5,000 도엽 단위 항공 정사영상 세트. (B060)정사영상_연도_도엽번호.tif를
+    재귀 수집해 연도별 장수·0바이트·중복(연도×도엽)·전송 잔재(.irx)를 검사한다.
+    (항공 tif에는 좌표 앵커가 없어 도엽번호 체계로 georeference를 복원한다 — ops_log §6)"""
+    folder = os.path.join(DATA_ROOT, ds["path"])  # 절대경로(Z: 등)면 그대로 쓰임
+    if not os.path.isdir(folder):
+        report("FAIL", ds["id"], f"폴더 없음: {folder}")
+        return
+    pat = re.compile(r"\(B060\)정사영상_(\d{4})_(\d{8})\.tif$")
+    counts: dict[str, int] = {}
+    seen: set[tuple[str, str]] = set()
+    zero, dup = [], []
+    irx = 0
+    for root, _d, files in os.walk(folder):
+        for fn in files:
+            if fn.endswith(".irx"):
+                irx += 1
+                continue
+            m = pat.search(fn)
+            if not m:
+                continue
+            if os.path.getsize(os.path.join(root, fn)) == 0:
+                zero.append(fn)
+                continue
+            key = (m.group(1), m.group(2))
+            if key in seen:
+                dup.append(fn)
+                continue
+            seen.add(key)
+            counts[m.group(1)] = counts.get(m.group(1), 0) + 1
+    ok = True
+    for year, expected in ds["expected_counts"].items():
+        n = counts.get(str(year), 0)
+        if n != expected:
+            report("FAIL", ds["id"], f"{year}년 {n}도엽 != 기준값 {expected}도엽")
+            ok = False
+    if zero or dup or irx:
+        report("FAIL", ds["id"],
+               f"0바이트 {len(zero)} · 중복(연도×도엽) {len(dup)} · 전송 잔재(.irx) {irx}")
+        ok = False
+    if ok:
+        detail = ", ".join(f"{y}년 {n}" for y, n in sorted(counts.items()))
+        report("OK", ds["id"], f"{sum(counts.values())}도엽 ({detail})")
+
+
 def check_local_csv(src: dict) -> None:
     path = os.path.join(DATA_ROOT, src["path"])
     if not os.path.isfile(path):
@@ -193,6 +239,8 @@ def main() -> int:
             check_shp_zip_set(ds)
         elif ds["kind"] == "raster_scene_set":
             check_raster_scene_set(ds)
+        elif ds["kind"] == "aerial_sheet_set":
+            check_aerial_sheet_set(ds)
         else:
             report("WARN", ds["id"], f"검사 미구현 kind: {ds['kind']}")
 

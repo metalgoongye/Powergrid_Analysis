@@ -75,7 +75,8 @@ datasets:
 
   - id: cadastral_parcels_2024
     kind: shp_zip_set
-    path: powergrid_spatial_data/연속지적도형정보
+    path: Z:\powergrid_spatial_data\연속지적도형정보
+    # ↑ 2026-10-26 사용자가 D:→Z:(연구원 NAS)로 이동(D: 용량 고갈) — zip 17개 레코드 수 재검증으로 확인
     source: 국가공간정보포털 연속지적도형정보(AL_D002), 기준일 2024-12-04
     license: 공공데이터 (국가공간정보포털 이용조건)
     security: public
@@ -133,7 +134,9 @@ datasets:
 
   - id: kls_ortho_pilot_new
     kind: raster_scene_set
-    path: powergrid_spatial_data/정사영상_전국/위성정사영상_분석대상지역   # 2026-10-20 폴더명 변경(구: 신규신청_보령서천은평)
+    path: Z:\powergrid_spatial_data\위성정사영상\위성정사영상_분석대상지역
+    # ↑ 2026-10-26 D:→Z:(연구원 NAS) 이전 — 228파일 308.6GB 전수 대조(상대경로·용량) 일치 확인 후 전환.
+    #   (구 경로: powergrid_spatial_data/정사영상_전국/... , 2026-10-20 폴더명 변경 이력은 git 참조)
     source: 국토지리정보원 국토위성(CAS500-1) L2G 정사영상, 포털 주문분 2026-10-13~15·10-20 수령
     license: 국토지리정보원 국토위성영상 이용약관
     security: internal   # 영상 자체는 경관이나, GeoAI 탐지 산출물(설비 좌표)은 out/internal
@@ -212,25 +215,31 @@ datasets:
       - C1_20251025015909_25504_00563067
       - C1_20251025015909_25504_00582958
 
-  - id: kls_ortho_seocheon_2024
-    kind: raster_scene_set
-    path: powergrid_spatial_data/정사영상_전국/충남_서천군
-    source: 국토지리정보원 국토위성(CAS500-1) L2G 정사영상, 기보유분
-    license: 국토지리정보원 국토위성영상 이용약관
-    security: internal
-    crs_epsg: 5179
-    resolution_m: 0.5
-    acquisition_date: 2024-11-07, 2024-11-22
-    bands: [R_PS, G_PS, B_PS]
-    note: 서천군 5장 정본(신규 폴더의 동일 장면 5장이 중복 — 이쪽을 정본으로 유지).
-    verified: 2026-10-15
-    scenes:
-      - C1_20241107015130_20156_00371175
-      - C1_20241107015130_20156_00393991
-      - C1_20241107015130_20156_00416827
-      - C1_20241122015949_20384_00348907
-      - C1_20241122015949_20384_00369071
+# [퇴역 2026-10-26] kls_ortho_seocheon_2024 — 서천 위성 5장 정본(26.5GB)이 D: 공간
+# 확보 중 영구 삭제됨(ops_log §7). 위성 탐지 트랙은 부정적 결과로 종결(methods §9)이고
+# 25cm 항공(kls_aerial25_pilot)으로 대체하므로 원본 재주문 없이 퇴역 [사용자 결정 2026-10-26].
+# 파생물 보존: 타일 jpg(tiles_pilot·HF wp2026-tiles-pilot zip), georef(out/public/s3_scene_georef.csv),
+# OSM 대조 기준표(out/internal). 장면 5개: C1_20241107015130_20156_00371175·00393991·00416827,
+# C1_20241122015949_20384_00348907·00369071 (재주문 시 이 ID로).
 
-# 항공영상(보유 2개 권역)은 GeoAI 파일럿 착수 시 raster_scene_set 또는 별도
-# kind로 등록한다. 양식: id, kind, path, source, license, security, crs_epsg,
-# resolution_m, acquisition_date, verified
+  - id: kls_aerial25_pilot
+    kind: aerial_sheet_set
+    path: Z:\powergrid_spatial_data\위성정사영상\위성정사영상_분석대상지역\261026_25cm
+    # ↑ 절대경로(연구원 NAS 개인홈) — D: 용량 고갈로 영상 보관을 Z:로 이전 [2026-10-26, ops_log]
+    source: 국토정보플랫폼(map.ngii.go.kr) 항공 정사영상 25cm(B060), 사용자 수동 다운로드(Innorix), 2026-10-26 수령
+    license: 국토지리정보원 정사영상 이용약관(출처 명시)
+    security: internal   # 영상 자체는 공개용(B060)이나, 탐지 산출물(설비 좌표)은 out/internal
+    crs_epsg: 5186
+    resolution_m: 0.25
+    acquisition_date: 2024년 358도엽, 2025년 125도엽 (도엽별 촬영일은 동반 메타 xml)
+    note: >-
+      파일럿 5개 권역(화성·세종·은평·보령·서천) 1:5,000 도엽 483개(154.5GB, 메타 xml 483개).
+      OSM 설비 커버: 철탑 1,477/1,482기(99.7%)·변전소 41/42곳 — 잔여 4도엽
+      (세종 36710006 변전소 1곳, 보령 36610048·36610039·36610038 철탑 5기)은 해안·경계
+      끝단으로 선택 수령. 세종은 행복도시권+철탑 보완 23도엽 구성. tif에 좌표 앵커 없음 —
+      도엽번호 체계(1°셀→50k 4×4→5k 10×10)로 georeference 복원(ops_log §6).
+      2025년 125도엽(화성 쪽)은 기준년(2024) 밖 — 시점 플래그. 37616037은 2024·2025 두 판 보유.
+    verified: 2026-10-26
+    expected_counts:
+      "2024": 358
+      "2025": 125
