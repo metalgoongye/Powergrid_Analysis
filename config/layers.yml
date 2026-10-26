@@ -6,7 +6,7 @@
 datasets:
   - id: kor_infra
     kind: gpkg
-    path: powergrid_spatial_data/36pJ2bwdQr/KOR.gpkg
+    path: powergrid_spatial_data/OSM_powergrid/KOR.gpkg
     source: OpenInfraMap export 2026-09-01 (© OpenStreetMap contributors)
     license: ODbL
     security: internal

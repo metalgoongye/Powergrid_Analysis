@@ -37,7 +37,7 @@ M = [
       ("보정코드", None, "통근 순임금 보정 스크립트 — 미작성")]),
     ("σ(Z) 신호보존율",
      "격자 수요지도 × 변전소 권역 배정(규칙①~④) → 원가신호 보존율",
-     [("재료", r"powergrid_spatial_data\36pJ2bwdQr\KOR.gpkg", "data"),
+     [("재료", r"powergrid_spatial_data\OSM_powergrid\KOR.gpkg", "data"),
       ("재료", r"rdb\변전소별_접속가능여유용량\한전ON_변전소별_전력공급_여유용량_20261008.csv", "data"),
       ("재료", r"out\public\s1_grid_demand_2024.csv.gz", "repo"),
       ("코드", r"scripts\s2_zones_nearest.py", "repo"),

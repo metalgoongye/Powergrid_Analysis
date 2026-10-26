@@ -37,7 +37,7 @@ out/internal/              좌표 포함 산출물 (git 제외, 반출 금지)
 
 | 자료 | 위치 (DATA_ROOT 기준) | 라이선스 |
 |---|---|---|
-| 전력·인프라 벡터 26 레이어 | `powergrid_spatial_data/36pJ2bwdQr/KOR.gpkg` | ODbL (파생물 동일조건) |
+| 전력·인프라 벡터 26 레이어 | `powergrid_spatial_data/OSM_powergrid/KOR.gpkg` | ODbL (파생물 동일조건) |
 | 행정경계 시도 17·시군구 252·읍면동 3,559 (SGIS 2025 2Q, EPSG:5179) | `행정경계/bnd_*_00_2025_2Q/` | 공공누리 |
 | 한전 읍면동별 공급변전소 4,557행 | `한국전력공사_지역별 공급가능 변전소 정보_20240513.csv` | 공공데이터포털 |
 

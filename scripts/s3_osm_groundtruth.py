@@ -22,7 +22,7 @@ from pyproj import Transformer
 sys.stdout.reconfigure(encoding="utf-8")
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_ROOT = os.environ.get("DATA_ROOT", r"D:\z03.SmartGrid")
-GPKG = os.path.join(DATA_ROOT, "powergrid_spatial_data", "36pJ2bwdQr", "KOR.gpkg")
+GPKG = os.path.join(DATA_ROOT, "powergrid_spatial_data", "OSM_powergrid", "KOR.gpkg")
 SHP = os.path.join(DATA_ROOT, "행정경계", "bnd_sigungu_00_2025_2Q", "bnd_sigungu_00_2025_2Q")
 OUT = os.path.join(REPO, "out", "internal")
 TARGETS = ["서천군", "보령시", "은평구", "화성시", "세종시"]  # 화성·세종 추가 2026-10-20

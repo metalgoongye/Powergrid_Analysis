@@ -28,7 +28,7 @@ if hasattr(sys.stdout, "reconfigure"):
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_ROOT = os.environ.get("DATA_ROOT", r"D:\z03.SmartGrid")
-GPKG = os.path.join(DATA_ROOT, "powergrid_spatial_data", "36pJ2bwdQr", "KOR.gpkg")
+GPKG = os.path.join(DATA_ROOT, "powergrid_spatial_data", "OSM_powergrid", "KOR.gpkg")
 GRID = os.path.join(REPO, "out", "public", "s1_grid_demand_2024.csv.gz")
 OUT_PUB = os.path.join(REPO, "out", "public")
 OUT_INT = os.path.join(REPO, "out", "internal")
