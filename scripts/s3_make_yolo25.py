@@ -32,7 +32,9 @@ GT = os.path.join(REPO, "out", "internal", "s3_osm_groundtruth.csv")
 OUT = os.path.join(REPO, "out", "internal", "yolo25")
 
 CROP = 1024
-BOX = {"tower": 48, "substation": 192}   # px (0.25m 기준)
+BOX = {"tower": 96, "substation": 192}   # px (0.25m 기준)
+# 철탑 96px(24m): 정사영상 기복변위로 탑체가 기초점에서 비스듬히 누워 보임 —
+# 48px(기초만)로는 격자 구조가 상자 밖에 남는 것을 크롭 육안 확인 [2026-10-27]
 CLS = {"tower": 0, "substation": 1}
 TRAIN = {"화성시", "세종시"}
 EVAL = {"서천군", "보령시", "은평구"}
