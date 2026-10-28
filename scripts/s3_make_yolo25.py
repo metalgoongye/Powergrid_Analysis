@@ -3,11 +3,11 @@
 
 위성(0.5m) 때의 전면 타일링(5.2만 장) 대신, OSM 설비(철탑·변전소) 중심
 1024px 크롭과 동수의 배경 크롭만 생성한다(학습·평가에 필요한 최소 집합).
-- 분할: 학습 = 화성·세종 / 평가 = 서천·보령·은평 (위성 §9-b와 동일 설계)
-- 상자: 철탑 48px(지상 12m)·변전소 192px(48m) 고정 — 0.5m 때의 2배(해상도 비례)
+- 분할: 학습 = 화성·세종·평택·기장 / 평가 = 서천·보령·은평 (위성 §9-b 설계 + 보강 1차)
+- 상자: 철탑 96px(24m, 기복변위 반영) 고정 · 변전소 = OSM 폴리곤 bbox 실크기(폴백 192px)
 - 배경: 설비 보유 도엽에서 설비로부터 400px(100m) 이상 떨어진 무작위 창
 - 좌표 사슬: GT(5179) → 5186 → 도엽 아핀(s3_sheet_georef.csv) → 픽셀
-- 산출물은 좌표 유도 가능(파일명=도엽+오프셋)이므로 out/internal/yolo25/
+- 산출물은 좌표 유도 가능(파일명=도엽+오프셋) — 비공개 유지, NAS(Z:\2026_WP_out\internal\yolo25)
 
 사용: python s3_make_yolo25.py          # 전체 생성 (기존 출력 삭제 후 재생성)
 """
@@ -29,14 +29,18 @@ REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 AERIAL = r"Z:\powergrid_spatial_data\위성정사영상\위성정사영상_분석대상지역\261026_25cm"
 GEOREF = os.path.join(REPO, "out", "public", "s3_sheet_georef.csv")
 GT = os.path.join(REPO, "out", "internal", "s3_osm_groundtruth.csv")
-OUT = os.path.join(REPO, "out", "internal", "yolo25")
+# 대용량 산출물(크롭 세트)은 D: 용량 제약으로 NAS에 쓴다 [사용자 결정 2026-10-28].
+# 작은 CSV 산출물은 종전대로 repo out/ 유지.
+OUT = r"Z:\2026_WP_out\internal\yolo25"
 
 CROP = 1024
-BOX = {"tower": 96, "substation": 192}   # px (0.25m 기준)
+BOX = {"tower": 96, "substation": 192}   # px (0.25m 기준) — 변전소는 폴리곤 없을 때 폴백
 # 철탑 96px(24m): 정사영상 기복변위로 탑체가 기초점에서 비스듬히 누워 보임 —
 # 48px(기초만)로는 격자 구조가 상자 밖에 남는 것을 크롭 육안 확인 [2026-10-27]
+# 변전소: GT의 OSM 폴리곤 bbox 실크기(w_m·h_m) 사용 — 고정 192px는 중앙값(82m=328px)의
+# 절반 수준이라 과소 상자였음. 창(1024px)보다 큰 설비는 창 경계로 잘린다 [2026-10-28]
 CLS = {"tower": 0, "substation": 1}
-TRAIN = {"화성시", "세종시"}
+TRAIN = {"화성시", "세종시", "평택시", "기장군"}  # 평택·기장 = 변전소 보강 1차 [2026-10-28]
 EVAL = {"서천군", "보령시", "은평구"}
 NEG_MIN_DIST = 400   # px — 배경 크롭의 설비 최소 이격(100m)
 JITTER = 300         # px — 양성 크롭 중심 흔들기(상자 위치 다양화)
@@ -87,17 +91,25 @@ def load_gt():
     return rows, X6, Y6, codes
 
 
+def box_px(r):
+    """객체의 상자 크기(px). 변전소는 폴리곤 bbox 실크기, 그 외 고정 BOX."""
+    if r["class"] == "substation" and r["w_m"]:
+        return (max(64.0, float(r["w_m"]) / 0.25),
+                max(64.0, float(r["h_m"]) / 0.25))
+    b = float(BOX[r["class"]])
+    return (b, b)
+
+
 def yolo_lines(objs, wx, wy):
     """창(wx, wy 원점) 안에 걸치는 객체들의 YOLO 라벨. 중심이 창 밖이면 제외."""
     lines = []
-    for cls, px, py in objs:
+    for cls, px, py, bw, bh in objs:
         cx, cy = px - wx, py - wy
         if not (0 <= cx < CROP and 0 <= cy < CROP):
             continue
-        b = BOX[cls]
         lines.append(f"{CLS[cls]} {cx / CROP:.6f} {cy / CROP:.6f} "
-                     f"{min(b, 2 * cx, 2 * (CROP - cx)) / CROP:.6f} "
-                     f"{min(b, 2 * cy, 2 * (CROP - cy)) / CROP:.6f}")
+                     f"{min(bw, 2 * cx, 2 * (CROP - cx)) / CROP:.6f} "
+                     f"{min(bh, 2 * cy, 2 * (CROP - cy)) / CROP:.6f}")
     return lines
 
 
@@ -108,7 +120,7 @@ def main():
     rows, X6, Y6, codes = load_gt()
 
     # 도엽별 객체 목록 (georef 있는 도엽만)
-    by_sheet = defaultdict(list)   # sheet -> [(cls, px, py, split)]
+    by_sheet = defaultdict(list)   # sheet -> [(cls, px, py, bw, bh, split)]
     n_skip = 0
     for i, r in enumerate(rows):
         code = codes[i]
@@ -119,7 +131,8 @@ def main():
         px = (X6[i] - float(g["x0"])) / 0.25
         py = (float(g["y0"]) - Y6[i]) / 0.25
         split = "train" if r["sigungu"] in TRAIN else "val"
-        by_sheet[code].append((r["class"], px, py, split))
+        bw, bh = box_px(r)
+        by_sheet[code].append((r["class"], px, py, bw, bh, split))
 
     if os.path.isdir(OUT):
         shutil.rmtree(OUT)
@@ -132,13 +145,13 @@ def main():
         g = sheets[code]
         W, H = int(g["width"]), int(g["height"])
         img = Image.open(os.path.join(AERIAL, g["rel_path"])).convert("RGB")
-        pts = np.array([(px, py) for _c, px, py, _s in objs])
-        all_objs = [(c, px, py) for c, px, py, _s in objs]
+        pts = np.array([(px, py) for _c, px, py, _bw, _bh, _s in objs])
+        all_objs = [(c, px, py, bw, bh) for c, px, py, bw, bh, _s in objs]
         covered = set()
         windows = []   # (wx, wy, is_pos, split)
 
         # 양성: 객체마다 1창 (이미 다른 창에 들어간 객체는 생략)
-        for oi, (cls, px, py, split) in enumerate(objs):
+        for oi, (cls, px, py, _bw, _bh, split) in enumerate(objs):
             if oi in covered:
                 continue
             wx = int(px - CROP / 2 + rng.integers(-JITTER, JITTER + 1))
@@ -149,7 +162,7 @@ def main():
             inside = (pts[:, 0] >= wx) & (pts[:, 0] < wx + CROP) & \
                      (pts[:, 1] >= wy) & (pts[:, 1] < wy + CROP)
             for j in np.flatnonzero(inside):
-                if objs[j][3] == split:
+                if objs[j][5] == split:
                     covered.add(int(j))
             windows.append((wx, wy, True, split))
 
@@ -164,7 +177,7 @@ def main():
             cx, cy = wx + CROP / 2, wy + CROP / 2
             d = np.hypot(pts[:, 0] - cx, pts[:, 1] - cy).min()
             if d >= NEG_MIN_DIST + CROP / 2:
-                negs.append((wx, wy, False, objs[0][3]))
+                negs.append((wx, wy, False, objs[0][5]))
         windows += negs
 
         for wx, wy, is_pos, split in windows:

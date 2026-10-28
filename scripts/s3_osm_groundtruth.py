@@ -8,7 +8,9 @@ KOR.gpkg(ODbL)에서 파일럿 3개 시군구(서천군·보령시·은평구) �
 - stdout에는 집계(건수)만 출력한다.
 - 파생물이므로 ODbL 고지를 산출물 헤더에 기록한다.
 
-출력: out/internal/s3_osm_groundtruth.csv (class, sigungu, x_5179, y_5179, osm_id)
+출력: out/internal/s3_osm_groundtruth.csv
+  (class, table, sigungu, x_5179, y_5179, w_m, h_m, osm_fid)
+  w_m·h_m = 폴리곤 설비의 외곽 bbox 크기(m, EPSG:5186) — 점 설비는 공란.
 """
 import csv
 import os
@@ -25,8 +27,10 @@ DATA_ROOT = os.environ.get("DATA_ROOT", r"D:\z03.SmartGrid")
 GPKG = os.path.join(DATA_ROOT, "powergrid_spatial_data", "OSM_powergrid", "KOR.gpkg")
 SHP = os.path.join(DATA_ROOT, "행정경계", "bnd_sigungu_00_2025_2Q", "bnd_sigungu_00_2025_2Q")
 OUT = os.path.join(REPO, "out", "internal")
-TARGETS = ["서천군", "보령시", "은평구", "화성시", "세종시"]  # 화성·세종 추가 2026-10-20
+TARGETS = ["서천군", "보령시", "은평구", "화성시", "세종시",  # 화성·세종 추가 2026-10-20
+           "평택시", "기장군"]  # 변전소 보강 1차(학습용) 추가 2026-10-28
 T = Transformer.from_crs("EPSG:4326", "EPSG:5179", always_xy=True)
+T86 = Transformer.from_crs("EPSG:4326", "EPSG:5186", always_xy=True)
 
 # (클래스, 테이블, 지오메트리 종류) — 폴리곤은 중심점으로 환산
 LAYERS = [("tower", "power_tower", "point"),
@@ -109,8 +113,12 @@ def points_in_edges(px, py, edges, chunk=2000):
 
 
 # ---- gpkg 지오메트리 (WKB) ----
-def gpkg_xy(blob):
-    """GPKG 바이너리 헤더를 건너뛰고 점 좌표 또는 폴리곤 외곽 중심을 반환."""
+def gpkg_pts(blob):
+    """GPKG 바이너리 헤더를 건너뛰고 외곽 점 목록을 반환.
+
+    Point → 점 1개, Polygon/MultiPolygon(첫 폴리곤) → 외곽 고리 전체.
+    중심은 평균으로, 크기는 min/max로 호출부가 계산한다.
+    """
     flags = blob[3]
     env_len = {0: 0, 1: 32, 2: 48, 3: 48, 4: 64}[(flags >> 1) & 7]
     off = 8 + env_len
@@ -119,22 +127,19 @@ def gpkg_xy(blob):
     gtype = struct.unpack_from(bo + "I", blob, off + 1)[0] & 0xFF
     if gtype == 1:  # Point
         x, y = struct.unpack_from(bo + "2d", blob, off + 5)
-        return x, y
-    if gtype == 3:  # Polygon — 외곽 고리 평균
-        nrings = struct.unpack_from(bo + "I", blob, off + 5)[0]
+        return [(x, y)]
+    if gtype == 3:  # Polygon — 외곽 고리
         npts = struct.unpack_from(bo + "I", blob, off + 9)[0]
         pts = struct.unpack_from(bo + f"{2 * npts}d", blob, off + 13)
-        xs = pts[0::2]; ys = pts[1::2]
-        return sum(xs) / len(xs), sum(ys) / len(ys)
-    if gtype == 6:  # MultiPolygon — 첫 폴리곤 외곽 평균
+        return list(zip(pts[0::2], pts[1::2]))
+    if gtype == 6:  # MultiPolygon — 첫 폴리곤 외곽
         # [npolys][wkb polygon ...] — 첫 폴리곤 본문으로 이동
         off2 = off + 9  # 멀티 헤더(바이트오더1+타입4+개수4)
         little2 = blob[off2]
         bo2 = "<" if little2 else ">"
         npts = struct.unpack_from(bo2 + "I", blob, off2 + 9)[0]
         pts = struct.unpack_from(bo2 + f"{2 * npts}d", blob, off2 + 13)
-        xs = pts[0::2]; ys = pts[1::2]
-        return sum(xs) / len(xs), sum(ys) / len(ys)
+        return list(zip(pts[0::2], pts[1::2]))
     return None
 
 
@@ -152,11 +157,21 @@ def main():
     counts = {}
     for cls, table, _kind in LAYERS:
         cur = db.execute(f'SELECT fid, geometry FROM "{table}"')
-        lons, lats, fids = [], [], []
+        lons, lats, fids, dims = [], [], [], []
         for fid, geom in cur:
-            xy = gpkg_xy(geom)
-            if xy:
-                lons.append(xy[0]); lats.append(xy[1]); fids.append(fid)
+            pts = gpkg_pts(geom)
+            if not pts:
+                continue
+            plon = [p[0] for p in pts]; plat = [p[1] for p in pts]
+            lons.append(sum(plon) / len(plon))
+            lats.append(sum(plat) / len(plat))
+            fids.append(fid)
+            if len(pts) > 1:  # 폴리곤 — 외곽 bbox 크기(m, 영상 좌표계 5186 기준)
+                px, py = T86.transform(np.array(plon), np.array(plat))
+                dims.append((round(float(px.max() - px.min()), 1),
+                             round(float(py.max() - py.min()), 1)))
+            else:
+                dims.append(("", ""))
         if not fids:
             continue
         X, Y = T.transform(np.array(lons), np.array(lats))
@@ -174,6 +189,7 @@ def main():
                 rows_out.append({"class": cls, "table": table, "sigungu": nm,
                                  "x_5179": round(float(X[i]), 1),
                                  "y_5179": round(float(Y[i]), 1),
+                                 "w_m": dims[i][0], "h_m": dims[i][1],
                                  "osm_fid": fids[i]})
             counts[(nm, cls, table)] = counts.get((nm, cls, table), 0) + int(hit.sum())
     db.close()
@@ -182,7 +198,8 @@ def main():
     with open(out, "w", newline="", encoding="utf-8") as f:
         f.write("# OSM(KOR.gpkg, © OpenStreetMap contributors, ODbL) 파생 — 비공개(out/internal)\n")
         w = csv.DictWriter(f, fieldnames=["class", "table", "sigungu",
-                                          "x_5179", "y_5179", "osm_fid"])
+                                          "x_5179", "y_5179", "w_m", "h_m",
+                                          "osm_fid"])
         w.writeheader()
         w.writerows(rows_out)
 
