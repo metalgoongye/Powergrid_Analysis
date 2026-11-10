@@ -50,6 +50,8 @@ M = [
       ("산출", r"out\public\s2_sigma34.csv", "repo"),
       ("코드", r"scripts\s2_sigma_gov.py", "repo"),
       ("산출", r"out\public\s2_sigma_gov.csv", "repo"),
+      ("코드", r"scripts\s2_sigma_combined.py", "repo"),
+      ("산출", r"out\public\s2_sigma_combined.csv", "repo"),
       ("코드", r"scripts\s4_compare_zonings.py", "repo"),
       ("산출", r"out\public\s4_zoning_compare.csv", "repo")]),
     ("μ 신규 진입 비중",
