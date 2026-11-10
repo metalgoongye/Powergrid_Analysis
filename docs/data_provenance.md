@@ -114,6 +114,17 @@
 | 산출물 | `out/public/s3_subst_match_summary.csv`·`_by_sido.csv`, `out/internal/s3_subst_match_detail.csv`(좌표 — 비공개) |
 | 한계·주의 | 이름 대조라 개명·별칭 미해결(잔여 37그룹). 제주 제외(육지 계통 기준). OSM 무명 154kV+ 피처 77은 대조 불가 — 수록률은 하한. 결측 114곳 명단(분당·광명 등 옥내형 다수) 확보 → 획정 보정 투입 가능. 상세 methods §9-d |
 
+## 4-2. OSM 철탑 결측률·보정판 (3단계 — 선형성 필터 확정, 완료)
+
+| 항목 | 내용 |
+|---|---|
+| 내용 | 본평가 고신뢰 탐지 중 OSM 무대응 35건을 선로 선형성 필터 + 크롭 육안 검수로 판가름 → 실측 결측률 확정, OSM+GeoAI 보정판 생성 |
+| 원자료 | detections25_dedup.csv(본평가), s3_osm_groundtruth.csv(평가 권역 OSM 철탑 561기), KOR.gpkg power_line(ODbL), 25cm 도엽(크롭) |
+| 가공 | 고신뢰(0.20) 388건 greedy 매칭(50m) → 무대응 35건 → 최근접 선로 거리 30m 문턱 → 크롭 몽타주 육안 확정. `scripts/s3_missing_towers.py` (2026-11-10) |
+| 결과 | 선로 위(0.1~4.7m) 6건 = 전부 실제 철탑, 선로 원거리(279m~7.2km) 29건 = 전부 오탐 → **실측 결측률 1.1%**(6/561), 보정판 567기. 오탐 군집 부재(결측 선로 회랑 정황 없음). 실질 정밀도 91.0→92.5% |
+| 산출물 | `out/public/s3_missing_towers_summary.csv`, `out/internal/s3_missing_towers.csv`·`s3_towers_corrected.csv`(좌표 — 비공개), 크롭 `Z:\2026_WP_out\internal\missing_crops\` |
+| 한계·주의 | 3개 권역 표본 기반 추정. 확정 6기 중 2기는 인접 OSM 철탑과 15~58m(쌍둥이/위치오차 가능). 보정판은 σ(Z) 규칙② 원판/보정판 감도 비교에 투입 예정. 상세 methods §9-e |
+
 ## 5. 취득 완료·가공 대기 자료
 
 | 자료 | 출처·vintage | 용도 | 상태 |
