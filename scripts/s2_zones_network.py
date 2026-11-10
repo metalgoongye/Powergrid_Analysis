@@ -85,7 +85,11 @@ def build_graph():
     return np.array(coords), adj
 
 
-def main() -> int:
+def assign_network(cx, cy):
+    """규칙 ② 배정 — (subs, assign, totdist, n_fallback) 반환.
+
+    totdist = 선로망 접속 직선거리 + 망 주행거리 (폴백 셀은 평면거리).
+    """
     subs = load_substations()          # 규칙 ①과 동일 845개소
     coords, adj = build_graph()
     nx, ny = coords[:, 0], coords[:, 1]
@@ -129,21 +133,6 @@ def main() -> int:
     print(f"망 도달 노드 {int(reached.sum()):,} / {n_node:,} "
           f"(미도달 = 변전소 없는 고립 성분)")
 
-    # 셀 적재
-    print("격자 적재…")
-    gx, gy, va, vb, vc = [], [], [], [], []
-    with gzip.open(GRID, "rt", encoding="utf-8") as f:
-        r = csv.reader(f)
-        next(r)
-        for row in r:
-            gx.append(int(row[0])); gy.append(int(row[1]))
-            va.append(float(row[2])); vb.append(float(row[3])); vc.append(float(row[4]))
-    gx = np.array(gx); gy = np.array(gy)
-    va = np.array(va); vb = np.array(vb); vc = np.array(vc)
-    cx = (gx + 0.5) * CELL
-    cy = (gy + 0.5) * CELL
-    print(f"  셀 {len(gx):,}")
-
     # 노드 버킷(도달 노드만 — 라벨 유효)
     bidx = defaultdict(list)
     for i in np.flatnonzero(reached):
@@ -157,10 +146,11 @@ def main() -> int:
 
     # 셀 버킷 단위로 후보 노드 수집 → min(e + d)
     print("규칙 ② 배정(버킷 링 탐색)…")
-    assign = np.full(len(gx), -1, dtype=np.int32)
+    assign = np.full(len(cx), -1, dtype=np.int32)
+    totdist = np.full(len(cx), np.nan)
     n_fallback = 0
     cell_buckets = defaultdict(list)
-    for i in range(len(gx)):
+    for i in range(len(cx)):
         cell_buckets[(int(cx[i] // BUCKET), int(cy[i] // BUCKET))].append(i)
     for (bx, by), members in cell_buckets.items():
         cand = []
@@ -185,15 +175,39 @@ def main() -> int:
         if not cand:
             # 망이 매우 먼 셀 — 평면 최근접 변전소 폴백
             for i in M:
-                assign[i] = int(np.argmin((sx - cx[i]) ** 2 + (sy - cy[i]) ** 2))
+                d2 = (sx - cx[i]) ** 2 + (sy - cy[i]) ** 2
+                j = int(np.argmin(d2))
+                assign[i] = j
+                totdist[i] = float(np.sqrt(d2[j]))
             n_fallback += len(M)
             continue
         C = np.concatenate(cand)
         e = np.hypot(nx[C][None, :] - cx[M][:, None],
                      ny[C][None, :] - cy[M][:, None])
         tot = e + ndist[C][None, :]
-        assign[M] = nlabel[C[np.argmin(tot, axis=1)]]
+        k = np.argmin(tot, axis=1)
+        assign[M] = nlabel[C[k]]
+        totdist[M] = tot[np.arange(len(M)), k]
     print(f"  폴백(망 원거리) 셀 {n_fallback:,}")
+    return subs, assign, totdist, n_fallback, snap
+
+
+def main() -> int:
+    print("격자 적재…")
+    gx, gy, va, vb, vc = [], [], [], [], []
+    with gzip.open(GRID, "rt", encoding="utf-8") as f:
+        r = csv.reader(f)
+        next(r)
+        for row in r:
+            gx.append(int(row[0])); gy.append(int(row[1]))
+            va.append(float(row[2])); vb.append(float(row[3])); vc.append(float(row[4]))
+    gx = np.array(gx); gy = np.array(gy)
+    va = np.array(va); vb = np.array(vb); vc = np.array(vc)
+    cx = (gx + 0.5) * CELL
+    cy = (gy + 0.5) * CELL
+    print(f"  셀 {len(gx):,}")
+
+    subs, assign, _totdist, n_fallback, snap = assign_network(cx, cy)
 
     # 집계
     agg = defaultdict(lambda: [0, 0.0, 0.0, 0.0])
