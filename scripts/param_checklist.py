@@ -73,7 +73,9 @@ M = [
       ("재료", r"powergrid_spatial_data\연속지적도형정보", "data"),
       ("코드", r"scripts\s1_grid_demand.py", "repo"),
       ("산출", r"out\public\s1_grid_demand_2024.csv.gz", "repo"),
-      ("코드", None, "산업용 배분 트랙·용도별 2D 레이킹 — 미작성")]),
+      ("코드", r"scripts\s1_industrial_alloc.py", "repo"),
+      ("산출", r"out\public\s1_grid_industrial_2024.csv.gz", "repo"),
+      ("코드", None, "용도별 2D 레이킹 — 미작성")]),
 ]
 
 
