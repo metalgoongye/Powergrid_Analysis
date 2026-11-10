@@ -237,6 +237,31 @@ GPU(Colab)로 추론만 외부화하는 설계. 여기서 보안정책 장애가
   MainWindowTitle이 빈 것만. ⑤ 검증용 TEXT 추출은 em dash(—)를
   `&#8212;`로 내보냄 — 검증 문자열에 — 를 넣지 않기.
 
-## 11. 이후 기록 (추가 예정)
+## 11. [2026-11-10] HWP 표·그림·수식 개체의 자동 주입
+
+- **배경**: §9에서는 표·그림·수식을 자동 주입하지 않기로 했으나(충실도
+  우선), 마감 일괄 작업에서 사본 시험 + PDF 렌더 검수를 전제로 자동화.
+- **표**: `TableCreate`(HTableCreation, WidthType=0 단에 맞춤) 후 커서가 첫
+  셀에 있을 때 `hwp.ParentCtrl`의 Properties에 TreatAsChar=1을 넣어야 본문
+  흐름에 고정된다. 생성 파라미터(TableProperties)로 주면 무시되어 표가 떠서
+  엉뚱한 문단 사이에 놓였음. 셀 이동은 `TableRightCell`, 표 탈출은 `CloseEx`.
+  셀 문단은 양쪽 정렬이 기본이라 글자가 벌어짐 — ParagraphShape AlignType
+  (1 왼쪽·3 가운데) 지정.
+- **그림**: `hwp.InsertPicture(path, True, 1, False, False, 0, 폭mm, 높이mm)`
+  + 반환 컨트롤에 TreatAsChar=1.
+- **수식**: `EquationCreate`(HEqEdit.string에 한글 수식 스크립트). 원고 docx의
+  OMML을 변환(분수 over·첨자·LEFT/RIGHT·sum from·bar). 함정 — ① `{rm …}`는
+  중괄호 밖으로 로만체가 새어 사용 금지 ② 식별자와 LEFT 사이에 공백 필수
+  (`uLEFT`가 한 덩어리로 읽힘) ③ underbrace 미지원(라벨 생략) ④ 긴 식은
+  `#`로 줄바꿈.
+- **검수 방법**: `SaveAs(…, "PDF")` → PyMuPDF로 해당 쪽을 PNG 렌더해 육안
+  확인(TEXT 추출만으로는 개체 위치·줄바꿈을 못 봄). 실제 문서 적용 전 항상
+  사본에서 먼저 실행.
+- **교훈**: ① 표가 들어간 뒤로는 문단 수 기반 범위 편집(전면 재주입)이
+  불가 — 이후 수정은 앵커 문자열 기반 패치만. ② 표 수치는 손으로 옮기지
+  않고 산출물 CSV에서 읽어 구성. ③ 표기(δ/θ)처럼 원고와 보고서가 갈린
+  곳은 개체를 넣기 전에 한쪽으로 통일.
+
+## 12. 이후 기록 (추가 예정)
 
 - 항공영상(25cm) 트랙, 전국 확장 시의 전송량 문제(수백 GB) 대처.
