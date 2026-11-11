@@ -48,7 +48,7 @@ def fig_pipeline():
         ("1단계\n수요 지도", "건물에너지 검침 × 지적\n→ 100m 격자 수요\n+ 산업용 연면적 배분", "#dbe9f6"),
         ("2단계\n권역 배정", "변전소 권역(벽돌)\n배정규칙 4종\n(최근접·망 거리·용량·무작위)", "#e2f0d9"),
         ("3단계\n전력망 검증", "철탑: 항공영상 GeoAI 탐지\n변전소: 한전 목록 대조\n(2기둥 검증)", "#fff2cc"),
-        ("4단계\n획정 비교", "신호 보존율 σ(Z)\n효율·단순성·분배 3축\n정부안 vs 계통 정합", "#f8d7da"),
+        ("4단계\n획정 비교", "대리 신호 보존율 σ(Z)\n행정 단위별 비교\n(4광역권·시도·시군구)", "#f8d7da"),
     ]
     w, gap, x0 = 21.5, 3.5, 1.5
     for i, (title, body, col) in enumerate(stages):
@@ -117,8 +117,8 @@ def fig_sigma_k():
         for r in csv.DictReader(ln for ln in f if not ln.startswith("#")):
             ks.append(int(r["구역수_K"])); ss.append(float(r["sigma"]))
     fig, ax = plt.subplots(figsize=(6.3, 3.6), dpi=200)
-    ax.plot(ks, ss, "-o", color="#c0392b", ms=3.5, lw=1.4, label="계통 정합 군집(시제품)")
-    label = {"정부안4광역권": "정부안\n(4광역권)", "시도": "시도", "시군구": "시군구", "변전소권역": "변전소 권역"}
+    ax.plot(ks, ss, "-o", color="#c0392b", ms=3.5, lw=1.4, label="변전소 권역 병합 시제품(표본 내)")
+    label = {"정부안4광역권": "4광역권\n(예시 분할)", "시도": "시도", "시군구": "시군구", "변전소권역": "변전소 권역"}
     for name, n, lo, hi in adm:
         mid = (lo + hi) / 2
         ax.errorbar([n], [mid], yerr=[[mid - lo], [hi - mid]], fmt="s", color="#1f4e79",
@@ -128,7 +128,7 @@ def fig_sigma_k():
     ax.errorbar([], [], fmt="s", color="#1f4e79", ms=5, label="행정구역 기반 획정(구간 = 배정규칙 4종)")
     ax.set_xscale("log"); ax.set_xlim(1.5, 1200); ax.set_ylim(0, 1.05)
     ax.set_xlabel("구역 수 (로그 눈금)", fontsize=8.5)
-    ax.set_ylabel("신호 보존율 σ(Z)", fontsize=8.5)
+    ax.set_ylabel("여유용량 신호 보존율 σ(Z)", fontsize=8.5)
     ax.tick_params(labelsize=7.5); ax.grid(alpha=0.3, lw=0.4)
     ax.legend(fontsize=7.5, loc="lower right", frameon=False)
     p = os.path.join(PUB, "fig_6_3_sigma_k.png")
