@@ -2,7 +2,7 @@
 r"""보고서 그림 4매 생성 (워킹페이퍼 삽입용).
 
   fig_3_1_pipeline.png   분석 파이프라인 개요(모식도)
-  fig_5_1_demand.png     전력수요 지도 — 건물계 / 산업용 (1km 집계, 로그 색)
+  fig_5_1_demand.png     전력수요 지도 — 주택·일반용 / 산업용 (1km 집계, 로그 색)
   fig_6_3_sigma_k.png    구역 수와 신호 보존율 — 행정 획정 vs 계통 정합 군집
   fig_5_2_towers.png     철탑 탐지 성공례 몽타주 (항공 25cm 크롭 — 비공개 폴더)
 
@@ -86,7 +86,7 @@ def fig_demand():
     ys = [k[1] for k in list(b) + list(ind)]
     x0, x1, y0, y1 = min(xs), max(xs), min(ys), max(ys)
     fig, axes = plt.subplots(1, 2, figsize=(7.1, 4.6), dpi=200)
-    for ax, acc, title in ((axes[0], b, "건물계(주택·일반) 212.6TWh"),
+    for ax, acc, title in ((axes[0], b, "주택·일반용(건물 검침 기반) 212.6TWh"),
                            (axes[1], ind, "산업용 286.2TWh")):
         img = np.full((y1 - y0 + 1, x1 - x0 + 1), np.nan)
         for (gx, gy), v in acc.items():
