@@ -115,7 +115,7 @@
 | 원자료 | ① 국토부 건물에너지DB 지번별 월별(2024~25, 24개 zip) ② 연속지적도형정보(국가공간정보포털, 2024-12-04본, 17개 시도 zip) ③ 한전 시군구·계약종별 월별 판매전력량(2023: 21,913행 / 2024: 21,967행) ④ SGIS 행정경계(2025 2Q) ⑤ GIS건물통합정보(2024-12-04본) |
 | 가공 | PNU 19자리 조인(성공 96.16%) → 시군구 명칭-코드 사전(특별자치도 별칭 처리) → 정합 검증(공개본 = 주택용+일반용의 95.1~95.7%, R²(로그) 0.974) → 신뢰구간 55~130% 규율 레이킹(플래그 11곳, 부하 3.2%) → 필지 중심점 100m 격자 집계 |
 | 결과 | 672,690셀, 연간 합 ⓐ200.3 / ⓑ212.6 / ⓒ190.4 TWh |
-| 산출물 | `out/public/s1_grid_demand_2024.csv.gz` + 메타. 스크립트 `scripts/s1_*.py` |
+| 산출물 | `out/public/s1_grid_demand_2024.csv.gz` + 메타. 스크립트 `scripts/s1_*.py`. ArcGIS 확인용 shapefile(100m 정사각형 폴리곤 672,690개, EPSG:5179, 필드 KWH_RAW·KWH_ADJ·KWH_EXCL) = `Z:\2026_WP_out\internal\s1_grid_shp\s1_grid_demand_2024.shp` — `scripts/s1_grid_to_shp.py`가 CSV를 형식만 바꿔 내보낸 것(값 불변, 재독 검산 + arcpy 판독 확인 2026-11-17) |
 | 방법 전거 | Deville & Särndal(1992) 캘리브레이션, Tobler(1979) pycnophylactic, WorldPop 선례 |
 | 한계·주의 | 산업용(월 ~23.7TWh)은 공개본 미수록 — 별도 배분 트랙. 검침월-사용월 시차(±1개월). 용도별 2D 레이킹 v2 예정 |
 
@@ -172,7 +172,7 @@
 | 원자료 | detections25_dedup.csv(본평가), s3_osm_groundtruth.csv(평가 권역 OSM 철탑 561기), KOR.gpkg power_line(ODbL), 25cm 도엽(크롭) |
 | 가공 | 고신뢰(0.20) 388건 greedy 매칭(50m) → 무대응 35건 → 최근접 선로 거리 30m 문턱 → 크롭 몽타주 육안 확정. `scripts/s3_missing_towers.py` (2026-11-10) |
 | 결과 | 선로 위(0.1~4.7m) 6건 = 전부 실제 철탑, 선로 원거리(279m~7.2km) 29건 = 전부 오탐 → **실측 결측률 1.1%**(6/561), 보정판 567기. 오탐 군집 부재(결측 선로 회랑 정황 없음). 실질 정밀도 91.0→92.5% |
-| 산출물 | `out/public/s3_missing_towers_summary.csv`, `out/internal/s3_missing_towers.csv`·`s3_towers_corrected.csv`(좌표 — 비공개), 크롭 `Z:\2026_WP_out\internal\missing_crops\` |
+| 산출물 | `out/public/s3_missing_towers_summary.csv`, `out/internal/s3_missing_towers.csv`·`s3_towers_corrected.csv`(좌표 — 비공개), 크롭 `Z:\2026_WP_out\internal\missing_crops\`. ArcGIS 확인용 shapefile(EPSG:5179, 좌표 — 비공개) = `Z:\2026_WP_out\internal\s3_towers_shp\` 아래 `s3_geoai_detections25.shp`(탐지 1,141점)·`s3_towers_corrected.shp`(보정판 567점) — `scripts/s3_towers_to_shp.py`가 CSV를 형식만 바꿔 내보낸 것. 같은 폴더 `s3_geoai_tower_links.shp`(선분 381개)는 **보기용** 연결선 — 점수 0.20 이상 탐지 480점을 최소신장나무로 잇고 500m 초과 98개 제외, 실제 전선 연결 순서가 아니며 분석에 쓰지 않음(`scripts/s3_tower_links.py`; 선분 중점이 OSM 선로 30m 이내인 비율 79.0%). 세 레이어 모두 재독 검산 + arcpy 판독 확인(2026-11-17) |
 | 한계·주의 | 3개 권역 표본 기반 추정. 확정 6기 중 2기는 인접 OSM 철탑과 15~58m(쌍둥이/위치오차 가능). 보정판은 σ(Z) 규칙② 원판/보정판 감도 비교에 투입 예정. 상세 methods §9-e |
 
 ## 5. 취득 완료·가공 대기 자료
