@@ -9,7 +9,8 @@
       "mcp__claude-in-chrome__tabs_context_mcp",
       "mcp__claude-in-chrome__find",
       "mcp__claude-in-chrome__read_page",
-      "mcp__claude-in-chrome__get_page_text"
+      "mcp__claude-in-chrome__get_page_text",
+      "ClaudeInChromeDomain(epsis.kpx.or.kr)"
     ]
   }
 }
