@@ -487,6 +487,27 @@
   변전소 수(6-7d, 2025년 939곳)와 다른 개념. 수요 쪽은 모선제에서도 구역으로 묶인다는
   점이 질문 3(요금구역 단위)의 배경이 됨.
 
+### 6-7f. GeoAI 탐지에 쓴 모델의 출처(서지) [2026-11-20 — 1차, 원문 페이지 확인]
+
+배경: 보고서 5장은 탐지 모델 이름(Grounding DINO, YOLOv8)을 적었으나 출처 인용과
+참고문헌 항목이 없었음(2026-11-20 작업본 대조). 탐지 절차(OSM 자동 라벨, 설비 중심
+크롭, 점-거리 대조)는 연구 과정에서 직접 설계한 것으로, methods.md 8~9-c절에 인용
+문헌이 없음 — 특정 논문의 절차를 따른 것이 아니므로 절차에는 인용을 붙이지 않는다.
+
+- **Grounding DINO**(1차 시도, 저장소 노트북의 모델 ID `IDEA-Research/grounding-dino-base`):
+  Liu, S., Zeng, Z., Ren, T., Li, F., Zhang, H., Yang, J., Jiang, Q., Li, C., Yang, J.,
+  Su, H., Zhu, J. and Zhang, L. 2023. Grounding DINO: Marrying DINO with Grounded
+  Pre-Training for Open-Set Object Detection. arXiv:2303.05499(2023-03-09 제출, 최신 v5
+  2024-07-19). arXiv 페이지에 학술지·학회 게재 표기는 없음.
+- **YOLOv8**(2·3차 시도, `yolov8s.pt`, ultralytics 패키지): 논문이 아니라 소프트웨어.
+  저장소 CITATION.cff의 소프트웨어 항목 — Jocher, G., Qiu, J. and Chaurasia, A. 2023.
+  Ultralytics YOLO(version 8.0.0, 2023-01-10 공개).
+  https://github.com/ultralytics/ultralytics. 라이선스 AGPL-3.0.
+  같은 파일의 'preferred-citation'은 2026년 YOLO26 논문(arXiv:2606.03748)인데 본 연구가
+  쓴 모델이 아니므로 인용하지 않는다.
+- 미확인: 영상에서 철탑을 딥러닝으로 찾은 선행연구는 검토 기록이 없음. 보고서 4장의
+  전력망 지도화 사례는 Arderne et al.(2020) 한 건.
+
 ### 6-8. 효과 정량화에 참고할 선행 추정치 [2026-11-14 — 출처 등급 표기]
 
 배경: "수도권-비수도권 혼잡료·입지 반응의 추정치가 없다"는 서술은 문헌을 찾아보지
