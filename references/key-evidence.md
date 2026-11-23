@@ -532,6 +532,32 @@ law.go.kr 머리말에는 분산법·전기사업법 모두 '시행 2026. 9. 18.
   연결). 지능형전력망법은 요금 조항이 없어 한 줄만. 도매 지역별 가격제를 도입하는 데 법
   개정이 필요한지는 확인하지 않았으므로 쓰지 않는다.
 
+### 6-7h. 참고문헌 저자 명단·게재 정보 보완 [2026-11-23 — 웹 검색, 기관 저장소·arXiv 목록]
+
+6-7의 '남은 것'(저자 전체 명단 미확인 5건)을 확인해 검토용 파일의 참고문헌에 반영.
+
+- **Mai et al.(2023)** arXiv:2304.06798, 저자 14명: Mai, Huang, Sun, Song, Mishra, Liu,
+  Gao, Liu, Cong, Hu, Cundy, Li, Zhu, Lao(도서관 목록 기록). 이후 ACM TSAS 10(2), 2024에
+  'Vision Paper' 제목으로 게재 — 본문 인용이 2023이므로 arXiv판으로 적음.
+- **Jakubik et al.(2023)** arXiv:2310.18660, 저자 32명. 앞 7명(Jakubik, Roy, Phillips,
+  Fraccaro, Godwin, Zadrozny, Szwarcman)만 확인 — 목록에는 7명 + et al.로 적음.
+- **Mateo Domingo et al.(2011)** IEEE Trans. Power Systems 26(1): 190-197, 저자 5명:
+  Mateo Domingo, Gómez San Román, Sánchez-Miralles, Peco González, Candela Martínez
+  (Comillas 저장소).
+- **Mateo et al.(2018)** IJEPES 99: 273-280, 저자 7명: Mateo, Prettico, Gómez, Cossent,
+  Gangale, Frías, Fulli.
+- **Palmintier et al.(2021)** 종전 'NREL 기술보고서' 표기는 부정확 — 학술지 논문임:
+  Electric Power Systems Research 190: 106665(온라인 2020-08, 2021-01호), 저자 7명
+  Palmintier, Elgindy, Mateo, Postigo, Gómez, de Cuadra, Dueñas.
+- **Grounding DINO** 학회 게재본: Computer Vision – ECCV 2024, LNCS 15105,
+  DOI 10.1007/978-3-031-72970-6_3(쪽 38-55는 저자가 넣은 서지에서 옴, 직접 대조 못 함).
+  참고문헌은 게재본(2024)으로 적었고 본문 인용 'Liu et al. 2023'은 2024로 고치도록 표시.
+- 원문을 열지 못해 저자 각주의 표기를 그대로 옮긴 것: 국정기획위원회(2025) 계획(안),
+  산업통상자원부(2023) 보도자료 제목, 한국전력공사(2022) 원가 정보의 공시 연도,
+  한국전력공사(2025) 장기 송·변전설비계획의 날짜. 연합뉴스 기사 주소는 다음 뉴스 전재본.
+- 법령 3건(분산에너지 활성화 특별법, 전기사업법, 지능형전력망법)은 본문에 법명·조항으로만
+  두고 참고문헌 목록에는 넣지 않음(법률 번호를 원문으로 대조하지 못함).
+
 ### 6-8. 효과 정량화에 참고할 선행 추정치 [2026-11-14 — 출처 등급 표기]
 
 배경: "수도권-비수도권 혼잡료·입지 반응의 추정치가 없다"는 서술은 문헌을 찾아보지
